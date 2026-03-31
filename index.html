@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your AI Advisor Prompt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c26;
+      --border: #2a2a3a;
+      --accent: #7c6dfa;
+      --accent2: #fa6d9a;
+      --accent3: #6dfabc;
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --prompt-bg: #0f0f18;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      padding: 72px 0 48px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 7vw, 58px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #a89cf7 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      font-weight: 300;
+    }
+
+    /* Instructions */
+    .instructions {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .instructions::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .instructions h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 1px;
+    }
+
+    /* Prompt box */
+    .prompt-section {
+      margin-bottom: 32px;
+    }
+
+    .prompt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .prompt-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), #9d91fb);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .copy-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .copy-btn:hover::before { opacity: 1; }
+    .copy-btn:active { transform: scale(0.97); }
+
+    .copy-btn.copied {
+      background: linear-gradient(135deg, var(--accent3), #4df0a0);
+      color: #0a0a0f;
+    }
+
+    .copy-icon { font-size: 15px; }
+
+    .prompt-box {
+      background: var(--prompt-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      font-size: 14px;
+      line-height: 1.75;
+      color: #c8c8e0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 420px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      position: relative;
+    }
+
+    .prompt-box::-webkit-scrollbar { width: 6px; }
+    .prompt-box::-webkit-scrollbar-track { background: transparent; }
+    .prompt-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .prompt-box strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Platform buttons */
+    .platforms {
+      margin-bottom: 64px;
+    }
+
+    .platforms h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .platform-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .platform-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .platform-btn:hover {
+      transform: translateY(-2px);
+      border-color: transparent;
+    }
+
+    .platform-btn:hover::after { opacity: 1; }
+
+    .platform-btn.claude { --p: #c96442; }
+    .platform-btn.claude:hover { box-shadow: 0 8px 32px rgba(201,100,66,0.25); border-color: rgba(201,100,66,0.4); }
+
+    .platform-btn.chatgpt { --p: #10a37f; }
+    .platform-btn.chatgpt:hover { box-shadow: 0 8px 32px rgba(16,163,127,0.25); border-color: rgba(16,163,127,0.4); }
+
+    .platform-btn.gemini { --p: #4285f4; }
+    .platform-btn.gemini:hover { box-shadow: 0 8px 32px rgba(66,133,244,0.25); border-color: rgba(66,133,244,0.4); }
+
+    .platform-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .platform-btn.claude .platform-icon { background: rgba(201,100,66,0.15); }
+    .platform-btn.chatgpt .platform-icon { background: rgba(16,163,127,0.15); }
+    .platform-btn.gemini .platform-icon { background: rgba(66,133,244,0.15); }
+
+    .platform-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 24px 0 48px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Fade in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header { animation: fadeUp 0.6s ease both; }
+    .instructions { animation: fadeUp 0.6s 0.1s ease both; }
+    .prompt-section { animation: fadeUp 0.6s 0.2s ease both; }
+    .platforms { animation: fadeUp 0.6s 0.3s ease both; }
+
+    @media (max-width: 480px) {
+      .platform-grid { grid-template-columns: 1fr; }
+      .prompt-box { padding: 20px; font-size: 13px; }
+      .instructions { padding: 22px 20px; }
+      header { padding: 48px 0 32px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="eyebrow">AI Tools for Business Students</div>
+    <h1>Your Personal AI Advisor</h1>
+    <p class="subtitle">Copy the prompt below, paste it into any AI platform, and get a roadmap built around your goals.</p>
+  </header>
+
+  <div class="instructions">
+    <h2>How to use this</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>Copy the prompt using the button below</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>Click any platform button to open it — Claude, ChatGPT, or Gemini all work</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>Paste the prompt, fill in your details, and hit send</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>Answer the 5 follow-up questions for a sharper, more personalized response</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prompt-section">
+    <div class="prompt-header">
+      <span class="prompt-label">The Prompt</span>
+      <button class="copy-btn" onclick="copyPrompt()" id="copyBtn">
+        <span class="copy-icon">⎘</span>
+        <span id="copyText">Copy Prompt</span>
+      </button>
+    </div>
+    <div class="prompt-box" id="promptBox"></div>
+  </div>
+
+  <div class="platforms">
+    <h2>Open in your preferred platform</h2>
+    <div class="platform-grid">
+      <a href="https://claude.ai" target="_blank" class="platform-btn claude">
+        <div class="platform-icon"><img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=32" alt="Claude" width="32" height="32"></div>
+        <span>Claude</span>
+        <span class="platform-sub">by Anthropic</span>
+      </a>
+      <a href="https://chatgpt.com" target="_blank" class="platform-btn chatgpt">
+        <div class="platform-icon"><img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=32" alt="ChatGPT" width="32" height="32"></div>
+        <span>ChatGPT</span>
+        <span class="platform-sub">by OpenAI</span>
+      </a>
+      <a href="https://gemini.google.com" target="_blank" class="platform-btn gemini">
+        <div class="platform-icon"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=32" alt="Gemini" width="32" height="32"></div>
+        <span>Gemini</span>
+        <span class="platform-sub">by Google</span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    Paste the prompt · Fill in your details · Get your roadmap
+  </footer>
+
+</div>
+
+<script>
+const PROMPT = `Role: Act as a brutally honest AI coach who helps business students use AI to get ahead — faster than their classmates and more prepared than most entry-level hires. You've seen what works and what doesn't, and you don't waste time on generic advice.
+
+Task: I'm a business student at De Anza College who wants to use AI to do things I didn't think were possible yet — build real tools, automate real work, and show up to my first job already operating at a level most entry-level hires never reach. Here's my situation:
+
+• What I'm studying: [What are you studying, or what interests you most — even if you're still figuring it out? e.g., Marketing, Accounting, Entrepreneurship]
+• The job I'd brag about getting: [What's the role or industry you're actually excited about? e.g., running my own business, working in finance, breaking into tech]
+• My honest AI experience: [Pick one: 1. I haven't really used AI seriously yet / 2. I use AI from time to time / 3. I'm a daily user and want to go further than I thought possible]
+
+Meet me at my level and then push me past it. Don't give me advice I could have found in a TikTok video — show me what's actually possible for someone with my specific goals.
+
+Format: Structure your response using these six sections:
+
+1. Your Situation: Briefly reflect back what I told you and why my goals are achievable — be specific to me, not generic.
+2. Your AI Starter Pack: Recommend 3 AI tools that match my experience level right now. For each one, name it and give me one sentence on the exact thing it's best for — no fluff.
+3. Win This Week: Give me 2 highly specific ways to use AI this week to study smarter, tackle an assignment, or get ahead in a class. Make them concrete enough that I could start in the next 10 minutes.
+4. Get Hired: Give me 2 highly specific ways to use AI to prep for interviews, build my network, or make my job search actually work. Assume I'm starting from zero.
+5. Copy This Right Now: Write one custom, ready-to-paste prompt I can drop into one of your recommended tools immediately to see real value. Make it specific to my goals — not a template.
+6. Your 15-Minute Challenge: Tell me the single most useful thing I should do today — one action, one tool, 15 minutes. Make it feel like a dare.
+
+Before you respond to any of the sections above, ask me 5 targeted questions that will help you give me sharper, more personalized advice. Make the questions feel conversational, not like a form. Once I answer, then deliver the full response.`;
+
+// Render prompt with bold labels
+function renderPrompt() {
+  const box = document.getElementById('promptBox');
+  const escaped = PROMPT
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  const bolded = escaped.replace(/^(Role:|Task:|Format:|[0-9]+\. [^:]+:|•[^:]+:)/gm, '<strong>$1</strong>');
+  box.innerHTML = bolded;
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(PROMPT).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const txt = document.getElementById('copyText');
+    btn.classList.add('copied');
+    txt.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      txt.textContent = 'Copy Prompt';
+    }, 2000);
+  });
+}
+
+renderPrompt();
+</script>
+</body>
+</html>
